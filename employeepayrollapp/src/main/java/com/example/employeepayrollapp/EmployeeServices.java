@@ -1,5 +1,8 @@
 package com.example.employeepayrollapp;
 
+
+import com.example.employeepayrollapp.Employee;
+import com.example.employeepayrollapp.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,42 +14,32 @@ import java.util.Optional;
 public class EmployeeServices {
     private List<Employee> list=new ArrayList<>();
 
-
-    public void add(Employee employee){
+    @Autowired
+    private EmployeeRepository employeeRepository;
+    public Employee add(Employee employee){
         list.add(employee);
+        return employeeRepository.save(employee);
     }
 
-    public boolean delete(Long id){
-        for(Employee emp:list){
-            if(emp.getId()==id){
-                list.remove(emp);
-                return true;
-            }
+    public boolean deleting(Long id) {
+        if (employeeRepository.existsById(id)) {
+            employeeRepository.deleteById(id);
+            return true;
         }
         return false;
     }
     public List<Employee> fetchAll(){
-        return list;
+
+        return employeeRepository.findAll();
     }
 
-    public boolean update(long id ,Employee updateEmployee) {
-        for(Employee emp:list){
-            if(emp.getId()==id){
-                list.remove(emp);
-                list.add(updateEmployee);
-                return true;
-            }
-        }
-        return false;
+    public Employee update(long id ,Employee updateEmployee) {
+        return employeeRepository.findById(id).map(employee -> {employee.setName(updateEmployee.getName());
+            employee.setSalary(updateEmployee.getSalary());
+            return employeeRepository.save(employee);
+        }).orElse(null);
     }
-    public Employee check(long id){
-
-        for(Employee emp:list){
-            if(emp.getId()==id){
-                return emp;
-            }
-        }
-        return null;
+    public Optional<Employee> check(long id){
+        return employeeRepository.findById(id);
     }
 }
-
