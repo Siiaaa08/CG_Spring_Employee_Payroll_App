@@ -24,4 +24,11 @@ public class EmployeePayrollExceptionClass {
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
+
+    //for id exception
+    @ExceptionHandler(EmployeeNotFound.class)
+    public ResponseEntity<ErrorResponseClass> handleEmployeeId(EmployeeNotFound exception){
+        ErrorResponseClass response=new ErrorResponseClass("Employee not found",List.of(exception.getMessage()));
+        return new ResponseEntity<>(response,HttpStatus.NOT_FOUND);
+    }
 }
