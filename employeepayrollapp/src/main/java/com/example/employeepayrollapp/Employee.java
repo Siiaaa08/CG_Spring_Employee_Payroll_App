@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -13,9 +14,10 @@ import java.util.List;
 @Table(name = "employees")
 public class Employee {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name ="employee_id")
-    public long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)  // Ensure auto-increment is enabled
+    @Column(name = "employee_id", nullable = false, updatable = false)
+    private Long id;  // Change to Wrapper class Long instead of long
+
     @Pattern(regexp = "^[A-Za-z ]+$",message = "Name should contain alphabets and spaces")
     @NotNull(message="Employee name cannot be null")
     @Column(name="name")
@@ -36,16 +38,17 @@ public class Employee {
 
     @NotBlank(message = "Profile Pic cannot be empty")
     public String profilePic;
-    @ElementCollection
-    @CollectionTable(name="employee_department",joinColumns = @JoinColumn(name="id"))
-    @Column(name="department")
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "employee_department", joinColumns = @JoinColumn(name = "employee_id"))
+    @Column(name = "department")
     @NotEmpty(message = "Department cannot be empty")
-    public List<String> department;
+    private List<String> department = new ArrayList<>();
+
+
     public Employee(Employee emp){
         this.name=emp.name;
         this.salary=emp.salary;
         this.gender=emp.gender;
-        this.id=emp.id;
         this.department=emp.department;
         this.profilePic=emp.profilePic;
         this.note=emp.note;
@@ -62,5 +65,21 @@ public class Employee {
         this.note = note;
         this.profilePic = profilePic;
         this.department = department;
+    }
+    public void updateEmployee(Employee empPayrollDTO) {
+        if (empPayrollDTO.getName() != null)
+            this.name = empPayrollDTO.getName();
+        if (empPayrollDTO.getSalary() != 0)
+            this.salary = empPayrollDTO.getSalary();
+        if (empPayrollDTO.getGender() != null)
+            this.gender = empPayrollDTO.getGender();
+        if (empPayrollDTO.getStartDate() != null)
+            this.startDate = empPayrollDTO.getStartDate();
+        if (empPayrollDTO.getNote() != null)
+            this.note = empPayrollDTO.getNote();
+        if (empPayrollDTO.getProfilePic() != null)
+            this.profilePic = empPayrollDTO.getProfilePic();
+        if (empPayrollDTO.getDepartment() != null)
+            this.department = empPayrollDTO.getDepartment();
     }
 }
